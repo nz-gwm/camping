@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camping Checklist App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background-color: #e0e0e0;
+            margin-right: 5px;
+            border-radius: 8px 8px 0 0;
+        }
+        .tab.active {
+            background-color: #ffffff;
+            border-bottom: 2px solid #ffffff;
+        }
+        .camping-type {
+            display: none;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .camping-type.active {
+            display: block;
+        }
+        h2, h3 {
+            color: #2980b9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1f6391;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camping Checklist App</h1>
+
+    <div class="tabs" id="tabs">
+        <!-- Tabs will be dynamically added here -->
+    </div>
+
+    <div id="campingTypes">
+        <!-- Camping types will be dynamically added here -->
+    </div>
+
+    <input type="text" id="newTripType" placeholder="New Camping Trip Type">
+    <button onclick="addNewCampingType()">Add New Trip Type</button>
+
+    <script>
+        const campingTypes = [
+            {
+                name: "Tent Camping",
+                checklist: ["Tent", "Sleeping Bag", "Flashlight"]
+            },
+            {
+                name: "RV Camping",
+                checklist: ["RV Keys", "Water Hose", "Leveling Blocks"]
+            },
+            {
+                name: "Backpacking",
+                checklist: ["Backpack", "Map", "Compass"]
+            }
+        ];
+
+        function createCampingTypeElement(type, index) {
+            const container = document.createElement('div');
+            container.className = 'camping-type';
+            if (index === 0) container.classList.add('active');
+
+            const title = document.createElement('h2');
+            title.textContent = type.name;
+            container.appendChild(title);
+
+            const checklistTitle = document.createElement('h3');
+            checklistTitle.textContent = "Equipment Checklist";
+            container.appendChild(checklistTitle);
+
+            const checklist = document.createElement('ul');
+            type.checklist.forEach(item => {
+                const listItem = createListItem(item);
+                checklist.appendChild(listItem);
+            });
+            container.appendChild(checklist);
+
+            const addEquipmentInput = document.createElement('input');
+            addEquipmentInput.type = 'text';
+            addEquipmentInput.placeholder = 'Add new equipment';
+            container.appendChild(addEquipmentInput);
+
+            const addEquipmentButton = document.createElement('button');
+            addEquipmentButton.textContent = 'Add Equipment';
+            addEquipmentButton.onclick = () => {
+                const itemText = addEquipmentInput.value.trim();
+                if (itemText) {
+                    const listItem = createListItem(itemText);
+                    checklist.appendChild(listItem);
+                    addEquipmentInput.value = '';
+                }
+            };
+            container.appendChild(addEquipmentButton);
+
+            const shoppingListTitle = document.createElement('h3');
+            shoppingListTitle.textContent = "Shopping List";
+            container.appendChild(shoppingListTitle);
+
+            const shoppingList = document.createElement('ul');
+            shoppingList.className = 'shopping-list';
+            container.appendChild(shoppingList);
+
+            const addItemInput = document.createElement('input');
+            addItemInput.type = 'text';
+            addItemInput.placeholder = 'Add new item';
+            container.appendChild(addItemInput);
+
+            const addItemButton = document.createElement('button');
+            addItemButton.textContent = 'Add Item';
+            addItemButton.onclick = () => {
+                const itemText = addItemInput.value.trim();
+                if (itemText) {
+                    const listItem = createListItem(itemText);
+                    shoppingList.appendChild(listItem);
+                    addItemInput.value = '';
+                }
+            };
+            container.appendChild(addItemButton);
+
+            return container;
+        }
+
+        function createListItem(text) {
+            const listItem = document.createElement('li');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            listItem.appendChild(checkbox);
+            listItem.appendChild(document.createTextNode(text));
+            return listItem;
+        }
+
+        function addNewCampingType() {
+            const newTripTypeInput = document.getElementById('newTripType');
+            const newTripTypeName = newTripTypeInput.value.trim();
+            if (newTripTypeName) {
+                const newCampingType = {
+                    name: newTripTypeName,
+                    checklist: []
+                };
+                campingTypes.push(newCampingType);
+                renderTabs();
+                renderCampingTypes();
+                newTripTypeInput.value = '';
+            }
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs');
+            tabsContainer.innerHTML = '';
+            campingTypes.forEach((type, index) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab';
+                if (index === 0) tab.classList.add('active');
+                tab.textContent = type.name;
+                tab.onclick = () => switchTab(index);
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        function renderCampingTypes() {
+            const campingTypesContainer = document.getElementById('campingTypes');
+            campingTypesContainer.innerHTML = '';
+            campingTypes.forEach((type, index) => {
+                const typeElement = createCampingTypeElement(type, index);
+                campingTypesContainer.appendChild(typeElement);
+            });
+        }
+
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const campingTypeElements = document.querySelectorAll('.camping-type');
+            tabs.forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+                campingTypeElements[i].classList.toggle('active', i === index);
+            });
+        }
+
+        renderTabs();
+        renderCampingTypes();
+    </script>
+</body>
+</html>
