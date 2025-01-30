@@ -71,9 +71,16 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-left: 5px;
         }
         button:hover {
             background-color: #1f6391;
+        }
+        .delete-button {
+            background-color: #e74c3c;
+        }
+        .delete-button:hover {
+            background-color: #c0392b;
         }
     </style>
 </head>
@@ -92,20 +99,31 @@
     <button onclick="addNewCampingType()">Add New Trip Type</button>
 
     <script>
-        const campingTypes = [
-            {
-                name: "Tent Camping",
-                checklist: ["Tent", "Sleeping Bag", "Flashlight"]
-            },
-            {
-                name: "Campervan Camping",
-                checklist: ["Keys", "Water Hose", "Gas"]
-            },
-            {
-                name: "Backpacking",
-                checklist: ["Backpack", "Map", "Compass"]
-            }
-        ];
+        const STORAGE_KEY = 'campingTypes';
+
+        function loadCampingTypes() {
+            const storedData = localStorage.getItem(STORAGE_KEY);
+            return storedData ? JSON.parse(storedData) : [
+                {
+                    name: "Tent Camping",
+                    checklist: ["Tent", "Sleeping Bag", "Flashlight"]
+                },
+                {
+                    name: "Caravan Camping",
+                    checklist: ["Keys", "Water Hose", "Gas Bottle"]
+                },
+                {
+                    name: "Backpacking",
+                    checklist: ["Backpack", "Map", "Compass"]
+                }
+            ];
+        }
+
+        function saveCampingTypes() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(campingTypes));
+        }
+
+        const campingTypes = loadCampingTypes();
 
         function createCampingTypeElement(type, index) {
             const container = document.createElement('div');
@@ -121,8 +139,12 @@
             container.appendChild(checklistTitle);
 
             const checklist = document.createElement('ul');
-            type.checklist.forEach(item => {
-                const listItem = createListItem(item);
+            type.checklist.forEach((item, itemIndex) => {
+                const listItem = createListItem(item, () => {
+                    type.checklist.splice(itemIndex, 1);
+                    saveCampingTypes();
+                    renderCampingTypes();
+                });
                 checklist.appendChild(listItem);
             });
             container.appendChild(checklist);
@@ -137,8 +159,9 @@
             addEquipmentButton.onclick = () => {
                 const itemText = addEquipmentInput.value.trim();
                 if (itemText) {
-                    const listItem = createListItem(itemText);
-                    checklist.appendChild(listItem);
+                    type.checklist.push(itemText);
+                    saveCampingTypes();
+                    renderCampingTypes();
                     addEquipmentInput.value = '';
                 }
             };
@@ -162,8 +185,9 @@
             addItemButton.onclick = () => {
                 const itemText = addItemInput.value.trim();
                 if (itemText) {
-                    const listItem = createListItem(itemText);
-                    shoppingList.appendChild(listItem);
+                    type.checklist.push(itemText);
+                    saveCampingTypes();
+                    renderCampingTypes();
                     addItemInput.value = '';
                 }
             };
@@ -172,12 +196,19 @@
             return container;
         }
 
-        function createListItem(text) {
+        function createListItem(text, onDelete) {
             const listItem = document.createElement('li');
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             listItem.appendChild(checkbox);
             listItem.appendChild(document.createTextNode(text));
+
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'delete-button';
+            deleteButton.onclick = onDelete;
+            listItem.appendChild(deleteButton);
+
             return listItem;
         }
 
@@ -192,6 +223,7 @@
                 campingTypes.push(newCampingType);
                 renderTabs();
                 renderCampingTypes();
+                saveCampingTypes();
                 newTripTypeInput.value = '';
             }
         }
