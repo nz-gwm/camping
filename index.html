@@ -76,10 +76,21 @@
         button:hover {
             background-color: #1f6391;
         }
-        .delete-button {
+        .delete-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
             background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background-color 0.3s;
         }
-        .delete-button:hover {
+        .delete-icon:hover {
             background-color: #c0392b;
         }
     </style>
@@ -109,8 +120,8 @@
                     checklist: ["Tent", "Sleeping Bag", "Flashlight"]
                 },
                 {
-                    name: "Caravan Camping",
-                    checklist: ["Keys", "Water Hose", "Gas Bottle"]
+                    name: "RV Camping",
+                    checklist: ["RV Keys", "Water Hose", "Leveling Blocks"]
                 },
                 {
                     name: "Backpacking",
@@ -203,11 +214,11 @@
             listItem.appendChild(checkbox);
             listItem.appendChild(document.createTextNode(text));
 
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.className = 'delete-button';
-            deleteButton.onclick = onDelete;
-            listItem.appendChild(deleteButton);
+            const deleteIcon = document.createElement('span');
+            deleteIcon.textContent = '−'; // Minus symbol
+            deleteIcon.className = 'delete-icon';
+            deleteIcon.onclick = onDelete;
+            listItem.appendChild(deleteIcon);
 
             return listItem;
         }
